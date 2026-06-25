@@ -4,6 +4,22 @@ Application web **locale** qui anonymise des comptes rendus (CR) médicaux puis,
 **optionnellement**, aide à les rédiger via une IA — à partir du **texte
 anonymisé** uniquement.
 
+> ## ⚠️ Avertissement — outil pédagogique, PAS un dispositif médical
+>
+> **Cet outil est fourni à des fins UNIQUEMENT PÉDAGOGIQUES et de démonstration.**
+>
+> - Ce **n'est pas un dispositif médical (DM)** au sens du Règlement (UE)
+>   2017/745. Il n'est ni certifié, ni marqué CE, ni destiné à un usage clinique
+>   ou diagnostique.
+> - Il **ne doit pas** être utilisé pour la prise en charge de patients réels, ni
+>   pour produire des comptes rendus à visée médicale opposable.
+> - L'anonymisation repose sur des règles heuristiques **sans garantie
+>   d'exhaustivité** : aucune assurance que toutes les données identifiantes
+>   soient retirées sur un format de document non prévu.
+> - La génération de CR par IA peut produire des **erreurs** ; tout contenu doit
+>   être vérifié par un professionnel. Aucune responsabilité de l'auteur ne
+>   saurait être engagée du fait de son utilisation.
+
 > **Modèle de confidentialité**
 > - L'**anonymisation** est faite **100 % en local** (extraction PDF + masquage
 >   par règles dans le serveur Python local). Aucune donnée patient ne sort du poste.
@@ -158,9 +174,13 @@ frontend/
   peut nécessiter un type personnalisé ou un ajustement dans `extractors.py` /
   `rules.py`. Le récapitulatif permet de vérifier avant tout envoi à une IA.
 
-## Avertissement
+## Avertissement (rappel)
 
-Outil d'aide. La responsabilité de vérifier l'anonymisation (récapitulatif des
-éléments masqués + aperçu PDF) **avant** toute transmission à un service d'IA
-incombe à l'utilisateur. Aucune garantie d'exhaustivité du masquage sur un
-format de document non prévu.
+**Outil à des fins pédagogiques uniquement — ce n'est PAS un dispositif médical
+(DM).** Non certifié, non marqué CE, non destiné à un usage clinique ou
+diagnostique, et à ne pas utiliser sur des patients réels.
+
+La responsabilité de vérifier l'anonymisation (récapitulatif des éléments masqués
++ aperçu PDF) **avant** toute transmission à un service d'IA incombe à
+l'utilisateur. Aucune garantie d'exhaustivité du masquage sur un format de
+document non prévu, et aucune garantie d'exactitude des CR générés par l'IA.
