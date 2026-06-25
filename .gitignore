@@ -1,0 +1,49 @@
+# ============================================================================
+# Secrets & donnees locales — NE JAMAIS COMMITER
+# (clés API, chemins infra, types appris, journaux pouvant contenir des
+#  noms de fichiers patients)
+# ============================================================================
+llm.json
+config.json
+custom_types.json
+watcher_state.json
+*.log
+
+# CR generes / PDF anonymises eventuellement deposes dans le projet
+ANOM_*.pdf
+*_CR.txt
+
+# ============================================================================
+# Outils locaux
+# ============================================================================
+.claude/
+
+# ============================================================================
+# Artefacts de build
+# ============================================================================
+build/
+dist/
+installer/
+
+# ============================================================================
+# Python
+# ============================================================================
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ============================================================================
+# OS / editeurs
+# ============================================================================
+Thumbs.db
+Desktop.ini
+.DS_Store
+.idea/
+.vscode/
+*.swp

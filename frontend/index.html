@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="/favicon.ico" />
+<title>Aide à la rédaction de comptes rendus</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #243043; --line: #334155;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8; --accent2:#0ea5e9;
+    --ok: #34d399; --warn: #fbbf24; --danger:#f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5;
+  }
+  header { padding: 20px 24px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 20px; }
+  .badge {
+    display:inline-block; margin-top:6px; font-size:12px; color:var(--ok);
+    background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.3);
+    padding:2px 8px; border-radius:999px;
+  }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  @media (max-width: 860px){ .grid{ grid-template-columns:1fr; } }
+  .card {
+    background: var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:18px;
+  }
+  h2 { font-size:14px; text-transform:uppercase; letter-spacing:.04em;
+       color:var(--muted); margin:0 0 12px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:0 0 6px; }
+  select, textarea, input[type="text"], input[type="number"], input[type="password"] {
+    width:100%; background:var(--card2); color:var(--text);
+    border:1px solid var(--line); border-radius:10px; padding:10px;
+    font-size:14px; font-family:inherit;
+  }
+  .form2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; align-items:end; }
+  @media (max-width:760px){ .form2 { grid-template-columns:1fr; } }
+  .field label { display:block; margin-bottom:6px; }
+  .drop.compact { padding:14px; }
+  .drop.compact p { margin:0; font-size:13px; }
+  textarea { min-height: 220px; resize:vertical; }
+  #out { min-height: 420px; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size:13px; white-space:pre; }
+  .pdfview { width:100%; height:560px; border:1px solid var(--line); border-radius:10px; background:#f1f5f9; }
+  .pdfscroll { overflow:auto; padding:12px; }
+  .pdfscroll canvas { display:block; margin:0 auto 12px; box-shadow:0 1px 6px rgba(0,0,0,.35); max-width:100%; height:auto; }
+  .pdfscroll .loading { color:#475569; text-align:center; padding:40px; font-size:13px; }
+  .viewtabs { display:flex; gap:6px; }
+  .viewer-head { display:flex; justify-content:space-between; align-items:center;
+    gap:12px; min-height:38px; margin-bottom:12px; }
+  .viewer-head h2 { margin:0; }
+  .tab { font-size:13px; padding:6px 12px; border-radius:8px; cursor:pointer;
+    background:var(--card2); border:1px solid var(--line); color:var(--muted); user-select:none; }
+  .tab.active { background:var(--accent); color:#04263a; border-color:var(--accent); font-weight:600; }
+  #previewRow { margin-top:20px; }
+  .grid.single { grid-template-columns:1fr; }
+  .muted-box { color:var(--muted); font-size:13px; text-align:center;
+    padding:40px 20px; border:1px dashed var(--line); border-radius:10px; }
+  .tabs-nav { display:flex; gap:8px; margin-top:14px; }
+  .navtab { background:var(--card2); border:1px solid var(--line); color:var(--muted);
+    padding:9px 18px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; }
+  .navtab.active { background:var(--accent); color:#04263a; border-color:var(--accent); }
+  .cfg-row { display:grid; grid-template-columns:1fr 190px 110px 110px 36px; gap:10px;
+    align-items:center; margin-bottom:10px; }
+  .cfg-head { font-size:12px; color:var(--muted); font-weight:600; }
+  .cfg-enabled { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text); }
+  .cfg-del { background:var(--card2); border:1px solid var(--line); color:var(--danger);
+    border-radius:8px; cursor:pointer; padding:8px 0; font-size:15px; font-weight:700; }
+  .cfg-exists { font-size:12px; margin-top:4px; }
+  .exists-ok { color:var(--ok); } .exists-no { color:var(--warn); }
+  .cfg-msg { font-size:13px; margin-top:12px; }
+  .drop {
+    border:2px dashed var(--line); border-radius:12px; padding:26px;
+    text-align:center; color:var(--muted); cursor:pointer; transition:.15s;
+    background:var(--card2);
+  }
+  .drop.drag { border-color:var(--accent); color:var(--accent); background:rgba(56,189,248,.07); }
+  .drop strong { color:var(--text); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  button {
+    border:none; border-radius:10px; padding:11px 18px; font-size:14px;
+    font-weight:600; cursor:pointer; color:#04263a; background:var(--accent);
+  }
+  button:hover { background:var(--accent2); }
+  button.secondary { background:var(--card2); color:var(--text); border:1px solid var(--line); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .hint { font-size:12px; color:var(--muted); margin-top:8px; }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 0; }
+  .pill {
+    font-size:12px; background:var(--card2); border:1px solid var(--line);
+    border-radius:999px; padding:4px 10px;
+  }
+  .pill b { color:var(--accent); }
+  details { margin-top:12px; }
+  summary { cursor:pointer; color:var(--muted); font-size:13px; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; }
+  td.orig { color:var(--warn); font-family:ui-monospace,monospace; }
+  td.repl { color:var(--accent); font-family:ui-monospace,monospace; }
+  .note { font-size:12px; color:var(--warn); background:rgba(251,191,36,.08);
+    border:1px solid rgba(251,191,36,.25); border-radius:10px; padding:10px; margin-top:12px; }
+  .err { color:var(--danger); font-size:13px; margin-top:10px; }
+  .spacer { height:14px; }
+  .filename { font-size:13px; color:var(--ok); margin-top:8px; }
+
+  /* ---- Workflow (style logiciel pro : liste a gauche, interpretation a droite) ---- */
+  .wf { display:grid; grid-template-columns: 320px 1fr; gap:18px; align-items:start; }
+  @media (max-width: 860px){ .wf { grid-template-columns:1fr; } }
+  .wf-list { display:flex; flex-direction:column; position:sticky; top:16px;
+    max-height: calc(100vh - 150px); }
+  .wf-listhead { display:flex; justify-content:space-between; align-items:center; }
+  .wf-listhead h2 { margin:0; }
+  .wf-refresh { padding:6px 12px; font-size:13px; }
+  .wf-sub { font-size:12px; color:var(--muted); margin:8px 0 12px; }
+  .wf-items { overflow:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px; }
+  .wf-item { background:var(--card2); border:1px solid var(--line); border-left:3px solid transparent;
+    border-radius:10px; padding:10px 12px; cursor:pointer; transition:.12s; }
+  .wf-item:hover { border-color:var(--accent); }
+  .wf-item.sel { border-color:var(--accent); border-left-color:var(--accent);
+    background:rgba(56,189,248,.10); }
+  .wf-item .nm { font-size:13px; color:var(--text); font-weight:600; word-break:break-word; }
+  .wf-item .meta { font-size:11px; color:var(--muted); margin-top:5px;
+    display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .wf-badge { font-size:11px; border-radius:999px; padding:1px 8px; border:1px solid var(--line); }
+  .wf-ok { color:var(--ok); border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.10); }
+  .wf-warn { color:var(--warn); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.08); }
+  .wf-crb { color:var(--accent); border-color:rgba(56,189,248,.4); background:rgba(56,189,248,.08); }
+  .wf-pend { color:var(--muted); border-color:var(--line); background:transparent; }
+  .wf-empty { font-size:13px; color:var(--muted); padding:20px 6px; text-align:center; }
+  .wf-detail .pdfview { height:430px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🩺 Aide à la rédaction de comptes rendus médicaux</h1>
+  <span class="badge">● Anonymisation 100 % locale — la génération IA (optionnelle) envoie le texte <b>anonymisé</b> au fournisseur choisi</span>
+  <nav class="tabs-nav">
+    <button class="navtab active" data-view="work">🗂 Workflow</button>
+    <button class="navtab" data-view="anon">✍ Manuel</button>
+    <button class="navtab" data-view="docs">📄 Gestion de document</button>
+    <button class="navtab" data-view="config">⚙ Configuration</button>
+    <button id="newExam" style="margin-left:auto">🔄 Nouvel examen</button>
+  </nav>
+</header>
+
+<main>
+ <div id="viewWork">
+  <div class="wf">
+    <!-- GAUCHE : liste de travail des examens -->
+    <section class="card wf-list">
+      <div class="wf-listhead">
+        <h2>Examens à interpréter</h2>
+        <button class="secondary wf-refresh" id="wfRefresh" title="Rafraîchir la liste">↻</button>
+      </div>
+      <div class="wf-sub" id="wfStatus">Chargement…</div>
+      <div id="wfItems" class="wf-items"></div>
+    </section>
+
+    <!-- DROITE : interprétation + CR -->
+    <section class="card wf-detail">
+      <div id="wfEmpty" class="muted-box">Sélectionne un examen dans la liste pour le vérifier et l'interpréter.</div>
+      <div id="wfPanel" style="display:none">
+        <div class="viewer-head">
+          <h2 id="wfTitle"></h2>
+          <div class="viewtabs" id="wfViewTabs">
+            <div class="tab active" data-wfview="anon">📄 Anonymisé</div>
+            <div class="tab" data-wfview="src">📄 Original</div>
+          </div>
+        </div>
+        <div class="pills" id="wfPills"></div>
+        <div class="spacer"></div>
+        <div id="wfAnonViewer" class="pdfview pdfscroll"></div>
+        <div id="wfSrcViewer" class="pdfview pdfscroll" style="display:none"></div>
+
+        <div class="spacer"></div>
+        <label for="wfObs">Votre interprétation (ajoutée au CR généré)</label>
+        <textarea id="wfObs" style="min-height:110px" placeholder="Ex. : trouble de la cinétique avec hypokinésie basale inférieure, fuite mitrale modérée, FEVG visuellement conservée…"></textarea>
+        <div class="hint">Le system prompt du type d'examen (réglé dans Configuration) + votre interprétation sont envoyés à l'IA avec le texte anonymisé.</div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button id="wfGen">🧠 Générer le CR (IA)</button>
+          <span class="cfg-msg" id="wfGenMsg"></span>
+        </div>
+
+        <div id="wfCrRow" style="display:none">
+          <div class="spacer"></div>
+          <h2>🧠 Compte rendu généré</h2>
+          <textarea id="wfCr" readonly style="min-height:320px"></textarea>
+          <div class="spacer"></div>
+          <div class="row">
+            <button class="secondary" id="wfCrCopy">📋 Copier le CR</button>
+            <button class="secondary" id="wfCrDownload">⬇ .txt</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+ </div><!-- /viewWork -->
+
+ <div id="viewAnon" style="display:none">
+  <!-- RANGEE 1 : CONTROLES -->
+  <div class="grid">
+    <section class="card">
+      <h2>1 · Source</h2>
+
+      <label for="type">Type de compte rendu</label>
+      <select id="type"></select>
+
+      <div class="spacer"></div>
+
+      <label>Fichier PDF</label>
+      <div class="drop" id="drop">
+        <p><strong>Glissez un PDF ici</strong> ou cliquez pour choisir</p>
+        <input type="file" id="file" accept="application/pdf" hidden />
+        <div class="filename" id="filename"></div>
+      </div>
+
+      <div id="textBlock">
+        <div class="hint">— ou collez directement le texte du CR ci-dessous —</div>
+        <div class="spacer"></div>
+        <label for="text">Texte (optionnel)</label>
+        <textarea id="text" placeholder="Collez ici le texte d'un compte rendu…"></textarea>
+      </div>
+
+      <div class="spacer"></div>
+      <label for="observations">Vos constatations (l'IA les intègre au CR rédigé)</label>
+      <textarea id="observations" style="min-height:90px"
+        placeholder="Ex. : trouble de la cinétique avec hypokinésie basale inférieure, fuite mitrale modérée, FEVG visuellement conservée…"></textarea>
+      <div class="hint">Notez ce que vous avez observé : l'IA en tiendra compte pour rédiger le CR. N'inscrivez aucune donnée identifiant le patient ici.</div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button id="go">Anonymiser</button>
+        <button id="goGen">🧠 Anonymiser et rédiger le CR</button>
+        <button class="secondary" id="reset">Réinitialiser</button>
+      </div>
+      <div class="err" id="err"></div>
+    </section>
+
+    <section class="card">
+      <h2>2 · Résultat anonymisé</h2>
+      <div class="pills" id="pills"></div>
+      <div id="resultEmpty" class="muted-box">Le résultat apparaîtra ici après anonymisation.</div>
+
+      <div id="resultActions" style="display:none">
+        <div class="spacer"></div>
+        <div class="row">
+          <button id="generate">🧠 Générer le CR (IA)</button>
+          <button class="secondary" id="downloadPdf" disabled>⬇ Télécharger le PDF anonymisé</button>
+          <button class="secondary" id="copy" disabled>📋 Copier le texte</button>
+          <button class="secondary" id="download" disabled>⬇ .txt</button>
+        </div>
+        <div class="hint" id="activeAi"></div>
+        <div class="err" id="genErr"></div>
+
+        <div class="note" id="note">
+          ⓘ Les <b>heures « nues »</b> (ex. 11:47, durées d'épisodes, durée
+          d'enregistrement) sont <b>conservées</b> car ce sont souvent des données
+          cliniques. Seules les dates calendaires et les horodatages date+heure
+          sont retirés.
+        </div>
+
+        <details id="detailsBox">
+          <summary>Vérifier le détail des éléments masqués (<span id="count">0</span>)</summary>
+          <table>
+            <thead><tr><th>Catégorie</th><th>Valeur d'origine</th><th>Remplacé par</th></tr></thead>
+            <tbody id="maskedRows"></tbody>
+          </table>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <!-- RANGEE 2 : VISIONNEUSES (alignées) -->
+  <div class="grid" id="previewRow" style="display:none">
+    <section class="card" id="srcCard" style="display:none">
+      <div class="viewer-head"><h2>CR original (sélectionné)</h2></div>
+      <div id="srcViewerWrap">
+        <div id="srcViewer" class="pdfview pdfscroll"></div>
+      </div>
+    </section>
+
+    <section class="card" id="outCard" style="display:none">
+      <div class="viewer-head">
+        <h2>CR anonymisé</h2>
+        <div class="viewtabs" id="viewtabs" style="display:none">
+          <div class="tab active" data-view="pdf">📄 PDF anonymisé</div>
+          <div class="tab" data-view="text">📝 Texte</div>
+        </div>
+      </div>
+      <div id="outViewer" class="pdfview pdfscroll" style="display:none"></div>
+      <textarea id="out" readonly placeholder="Le résultat anonymisé apparaîtra ici…"></textarea>
+    </section>
+  </div>
+
+  <!-- RANGEE 3 : COMPTE RENDU GÉNÉRÉ (pleine largeur, sous les 2 PDFs) -->
+  <div class="grid" id="reportRow" style="grid-template-columns:1fr; margin-top:20px; display:none">
+    <section class="card">
+      <h2>🧠 Compte rendu généré (IA)</h2>
+      <p class="hint">Vérifie les valeurs en les comparant aux deux aperçus ci-dessus avant de copier.</p>
+      <div class="spacer"></div>
+      <textarea id="reportOut" readonly style="min-height:420px" placeholder="Le CR généré apparaîtra ici…"></textarea>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="secondary" id="reportCopy">📋 Copier le CR</button>
+        <button class="secondary" id="reportDownload">⬇ .txt</button>
+      </div>
+    </section>
+  </div>
+ </div><!-- /viewAnon -->
+
+ <div id="viewConfig" style="display:none">
+  <div class="grid" style="grid-template-columns:1fr;">
+    <section class="card">
+      <h2>⚙ Surveillance automatique de dossiers</h2>
+      <p class="hint">
+        Définis les dossiers à surveiller. Dès qu'un PDF y est déposé, une version
+        <b>ANOM_…pdf</b> est créée à côté (même mise en page). Les modifications sont
+        appliquées automatiquement par le service de surveillance.
+      </p>
+
+      <div class="spacer"></div>
+      <div class="cfg-row cfg-head">
+        <div>Répertoire surveillé</div>
+        <div>Type de CR</div>
+        <div>Surveillance</div>
+        <div>Sous-dossiers</div>
+        <div></div>
+      </div>
+      <div id="cfgRows"></div>
+
+      <div class="spacer"></div>
+      <button class="secondary" id="cfgAdd">+ Ajouter un dossier</button>
+
+      <div class="spacer"></div>
+      <label for="cfgInterval">Fréquence de scan (secondes)</label>
+      <input type="number" id="cfgInterval" min="2" max="3600" value="10" style="max-width:160px" />
+
+      <div class="spacer"></div>
+      <div class="row">
+        <button id="cfgSave">💾 Enregistrer</button>
+        <button class="secondary" id="cfgReload">↻ Recharger</button>
+      </div>
+      <div class="cfg-msg" id="cfgMsg"></div>
+
+      <div class="note" style="margin-top:16px">
+        ⓘ Pour que la surveillance tourne, l'application doit être lancée (icône
+        « Anonymiseur CR ») ou le raccourci « Surveiller dossiers CR ». Type
+        <b>Détection automatique</b> = le type de CR est deviné d'après le contenu.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>🧠 Génération de CR (IA)</h2>
+      <p class="hint">
+        Génère un compte rendu à partir du texte <b>anonymisé</b>. Choisis ton
+        fournisseur d'IA, sa clé API et son modèle, puis colle ton « system
+        prompt » (l'équivalent d'un GEM Gemini / GPT) pour chaque type d'examen.
+      </p>
+
+      <div class="spacer"></div>
+      <label for="llmProvider"><b>IA utilisée pour générer les CR</b></label>
+      <select id="llmProvider" style="max-width:360px"></select>
+      <div class="hint">C'est ce fournisseur (une fois enregistré) qui sera appelé quand tu cliques « Générer le CR ».</div>
+
+      <div class="spacer"></div>
+      <label for="llmKey">Clé API <span id="llmProvLabel"></span></label>
+      <input type="password" id="llmKey" placeholder="laisser vide pour conserver la clé déjà enregistrée" autocomplete="off" />
+      <div class="cfg-exists" id="llmKeyState"></div>
+      <div class="spacer"></div>
+      <button class="secondary" id="llmTest">🔌 Tester la connexion</button>
+      <span class="cfg-msg" id="llmTestMsg" style="margin-left:10px"></span>
+
+      <div class="spacer"></div>
+      <label for="llmModel">Modèle (modifiable)</label>
+      <input type="text" id="llmModel" list="llmModels" style="max-width:360px" autocomplete="off" />
+      <datalist id="llmModels"></datalist>
+
+      <div class="spacer"></div>
+      <label for="llmType">System prompt — un par type d'examen</label>
+      <select id="llmType" style="max-width:360px"></select>
+      <div class="spacer"></div>
+      <textarea id="llmPrompt" style="min-height:220px" placeholder="Colle ici les instructions de ton GEM/GPT pour CE type d'examen : rôle, format du CR, recommandations à suivre…"></textarea>
+
+      <div class="spacer"></div>
+      <div class="row">
+        <button id="llmSave">💾 Enregistrer</button>
+        <button class="secondary" id="llmReload">↻ Recharger</button>
+      </div>
+      <div class="cfg-msg" id="llmMsg"></div>
+
+      <div class="note" style="margin-top:16px">
+        ⚠ La génération envoie le texte <b>anonymisé</b> au fournisseur d'IA choisi
+        (service externe). Vérifie le récapitulatif d'anonymisation avant d'envoyer.
+        Les clés API sont stockées localement sur ce poste. La génération utilise le
+        fournisseur enregistré ici.
+      </div>
+    </section>
+  </div>
+ </div><!-- /viewConfig -->
+
+ <div id="viewDocs" style="display:none">
+  <div class="grid" style="grid-template-columns:1fr;">
+    <section class="card">
+      <h2>➕ Ajouter un type de document (assisté par IA)</h2>
+      <p class="hint">
+        Fournis un CR <b>FICTIF</b> (faux patient) du nouveau type. L'IA repère les
+        champs identifiants et propose les règles ; elles tournent ensuite
+        <b>100 % en local</b>. ⚠ N'utilise <b>jamais</b> un vrai patient ici.
+      </p>
+      <div class="hint">Astuce : nom <b>ZZNOMTEST</b>, prénom <b>ZZPRENOMTEST</b>, n° <b>0000000001</b>, naissance <b>01/01/1900</b> (valeurs distinctives → vérification fiable).</div>
+
+      <div class="spacer"></div>
+      <div class="form2">
+        <div class="field">
+          <label for="ltName">Nom du type</label>
+          <input type="text" id="ltName" placeholder="ex. IRM cérébrale, Scanner thoracique…" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="ltKey">Clé API</label>
+          <input type="password" id="ltKey" placeholder="saisis la clé (mémorisée après analyse réussie)" autocomplete="off" />
+          <div class="cfg-exists" id="ltKeyState"></div>
+        </div>
+        <div class="field">
+          <label for="ltProvider">IA pour générer les règles</label>
+          <select id="ltProvider"></select>
+        </div>
+        <div class="field">
+          <label for="ltModel">Modèle</label>
+          <input type="text" id="ltModel" list="ltModels" placeholder="modèle" autocomplete="off" />
+          <datalist id="ltModels"></datalist>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <label>CR fictif (PDF) — <b>faux patient uniquement</b></label>
+      <div class="drop compact" id="ltDrop">
+        <p><strong>Glissez le PDF fictif</strong> ou cliquez</p>
+        <input type="file" id="ltFile" accept="application/pdf" hidden />
+        <div class="filename" id="ltFilename"></div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="row"><button id="ltAnalyze">🔎 Analyser avec l'IA</button><span class="cfg-msg" id="ltMsg" style="margin-left:10px"></span></div>
+
+      <div id="ltResult" style="display:none">
+        <div class="spacer"></div>
+        <div id="ltDetected" class="hint"></div>
+        <div id="ltLeftovers"></div>
+        <div class="hint" style="margin-top:8px">🟥 En <b style="color:#e23a3a">rouge</b> : les champs détectés qui seront anonymisés. Compare-les à l'original à gauche.</div>
+        <div class="grid" style="margin-top:12px">
+          <div>
+            <div class="cfg-head" style="margin-bottom:6px">CR fictif — original</div>
+            <div id="ltSrcViewer" class="pdfview pdfscroll"></div>
+          </div>
+          <div>
+            <div class="cfg-head" style="margin-bottom:6px">Champs détectés (en rouge)</div>
+            <div id="ltOutViewer" class="pdfview pdfscroll"></div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="row"><button id="ltSave">💾 Enregistrer ce type</button></div>
+      </div>
+
+      <div class="spacer"></div>
+      <label>Types personnalisés enregistrés</label>
+      <div id="ltList"></div>
+    </section>
+  </div>
+ </div><!-- /viewDocs -->
+</main>
+
+<script src="/vendor/pdfjs/pdf.min.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.js';
+
+let selectedFile = null;
+let lastPdf = null;     // { filename }
+let outUrl = null;      // object URL du PDF anonymisé (pour le téléchargement)
+let lastAnonText = '';  // dernier texte anonymisé (envoyé à l'IA)
+let lastCrType = '';    // type du dernier CR anonymisé (choix du system prompt)
+
+// Rend toutes les pages d'un PDF (ArrayBuffer/Uint8Array) en canvas dans `el`.
+// Vraie liseuse intégrée : indépendant du réglage "télécharger les PDF" du navigateur.
+async function renderPdf(el, data){
+  el.innerHTML = '<div class="loading">Chargement du document…</div>';
+  try {
+    const pdf = await pdfjsLib.getDocument({ data }).promise;
+    el.innerHTML = '';
+    for (let n = 1; n <= pdf.numPages; n++){
+      const page = await pdf.getPage(n);
+      const viewport = page.getViewport({ scale: 1.4 });
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      el.appendChild(canvas);
+      await page.render({ canvasContext: ctx, viewport }).promise;
+    }
+  } catch (e){
+    el.innerHTML = '<div class="loading">Impossible d\'afficher le PDF : ' + e.message + '</div>';
+  }
+}
+
+// Charger les types de CR
+fetch('/api/types').then(r => r.json()).then(d => {
+  $('type').innerHTML = d.types.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+});
+window.addEventListener('DOMContentLoaded', () => { refreshActiveAi(); loadWorkflow(); startWfPoll(); });
+
+// Drag & drop
+const drop = $('drop');
+drop.addEventListener('click', () => $('file').click());
+$('file').addEventListener('change', e => setFile(e.target.files[0]));
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+function setFile(f){
+  if (!f || f.type !== 'application/pdf') {
+    if (f) $('err').textContent = 'Veuillez choisir un fichier PDF.';
+    return;
+  }
+  $('err').textContent = '';
+  selectedFile = f;
+  $('filename').textContent = '✓ ' + f.name;
+  // Sources mutuellement exclusives : un PDF vide la zone texte.
+  if ($('text').value) $('text').value = '';
+  $('textBlock').style.display = 'none';
+  // Visionneuse du CR original (rendu canvas via PDF.js)
+  $('srcCard').style.display = 'block';
+  layoutPreview();
+  f.arrayBuffer().then(buf => renderPdf($('srcViewer'), buf));
+}
+
+// Affiche/masque la rangée d'aperçus et bascule en 1 ou 2 colonnes.
+function layoutPreview(){
+  const srcOn = $('srcCard').style.display !== 'none';
+  const outOn = $('outCard').style.display !== 'none';
+  if (!srcOn && !outOn){ $('previewRow').style.display = 'none'; return; }
+  $('previewRow').style.display = 'grid';
+  $('previewRow').classList.toggle('single', !(srcOn && outOn));
+}
+
+// Taper du texte annule le PDF sélectionné (sources mutuellement exclusives).
+$('text').addEventListener('input', () => {
+  if ($('text').value && selectedFile){
+    clearFile();
+  }
+});
+
+function clearFile(){
+  selectedFile = null; $('file').value=''; $('filename').textContent='';
+  $('srcViewer').innerHTML = '';
+  $('srcCard').style.display = 'none';
+  $('textBlock').style.display = 'block';
+  layoutPreview();
+}
+
+function newExam(){
+  clearFile(); lastPdf = null; lastAnonText = '';
+  $('text').value=''; $('out').value=''; $('pills').innerHTML='';
+  $('err').textContent='';
+  $('resultEmpty').style.display='block'; $('resultActions').style.display='none';
+  if (outUrl){ URL.revokeObjectURL(outUrl); outUrl = null; }
+  $('outViewer').innerHTML=''; $('outViewer').style.display='none';
+  $('out').style.display='block'; $('viewtabs').style.display='none';
+  $('outCard').style.display='none';
+  // Efface aussi le CR généré
+  $('reportRow').style.display='none'; $('reportOut').value=''; $('genErr').textContent='';
+  $('observations').value='';
+  $('copy').disabled = $('download').disabled = $('downloadPdf').disabled = true;
+  layoutPreview();
+  // Revient sur l'onglet Anonymiser, en haut.
+  document.querySelector('.navtab[data-view="anon"]').click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+$('reset').onclick = newExam;
+$('newExam').onclick = newExam;
+
+// Anonymise la source (PDF ou texte). Renvoie true si succès.
+async function runAnonymize(){
+  $('err').textContent = '';
+  const type = $('type').value;
+  const text = $('text').value.trim();
+  if (!selectedFile && !text) { $('err').textContent = 'Choisissez un PDF ou collez du texte.'; return false; }
+
+  const fd = new FormData();
+  fd.append('cr_type', type);
+  // PDF → endpoint qui conserve la mise en page ; texte collé → endpoint texte.
+  const endpoint = selectedFile ? '/api/anonymize-pdf' : '/api/anonymize';
+  if (selectedFile) fd.append('file', selectedFile);
+  else fd.append('text', text);
+
+  try {
+    const r = await fetch(endpoint, { method:'POST', body: fd });
+    const d = await r.json();
+    if (!r.ok) { $('err').textContent = d.detail || 'Erreur.'; return false; }
+    render(d);
+    return true;
+  } catch (e) {
+    $('err').textContent = 'Erreur réseau : ' + e.message;
+    return false;
+  }
+}
+
+$('go').onclick = async () => {
+  $('go').disabled = $('goGen').disabled = true; $('go').textContent = 'Anonymisation…';
+  try { await runAnonymize(); }
+  finally { $('go').disabled = $('goGen').disabled = false; $('go').textContent = 'Anonymiser'; }
+};
+
+// Anonymiser PUIS rédiger le CR (system prompt + constatations) en un clic.
+$('goGen').onclick = async () => {
+  $('go').disabled = $('goGen').disabled = true; $('goGen').textContent = 'Anonymisation…';
+  try {
+    if (!(await runAnonymize())) return;
+    $('goGen').textContent = '🧠 Rédaction du CR…';
+    await runGenerate();
+  } finally {
+    $('go').disabled = $('goGen').disabled = false;
+    $('goGen').textContent = '🧠 Anonymiser et rédiger le CR';
+  }
+};
+
+function render(d){
+  $('out').value = d.anonymized_text;
+  lastAnonText = d.anonymized_text || '';
+  lastCrType = d.type || $('type').value;
+  $('copy').disabled = $('download').disabled = false;
+  $('resultEmpty').style.display = 'none';
+  $('resultActions').style.display = 'block';
+  $('outCard').style.display = 'block';
+  // Réinitialise la zone CR généré
+  $('reportRow').style.display = 'none';
+  $('reportOut').value = '';
+  $('genErr').textContent = '';
+
+  // Nettoyage de l'ancienne visionneuse de sortie.
+  if (outUrl){ URL.revokeObjectURL(outUrl); outUrl = null; }
+
+  // PDF anonymisé disponible uniquement si la source était un PDF.
+  if (d.pdf_base64){
+    const bytes = Uint8Array.from(atob(d.pdf_base64), c => c.charCodeAt(0));
+    // Blob (copie) pour le téléchargement, conservé avant tout rendu.
+    outUrl = URL.createObjectURL(new Blob([bytes], {type:'application/pdf'}));
+    lastPdf = { filename: d.pdf_filename || 'CR_anonymise.pdf' };
+    $('downloadPdf').disabled = false;
+    $('viewtabs').style.display = 'flex';
+    showView('pdf');
+    renderPdf($('outViewer'), bytes);
+  } else {
+    lastPdf = null;
+    $('downloadPdf').disabled = true;
+    $('outViewer').removeAttribute('src'); $('outViewer').style.display='none';
+    $('out').style.display='block';
+    $('viewtabs').style.display = 'none';
+  }
+
+  // Pastilles récap
+  const s = d.summary || {};
+  const entries = Object.entries(s);
+  $('pills').innerHTML = entries.length
+    ? entries.map(([k,v]) => `<span class="pill">${k} <b>${v}</b></span>`).join('')
+    : '<span class="pill">Aucun élément identifiant détecté</span>';
+
+  // Détail (dédupliqué pour lisibilité)
+  const seen = new Set(); const rows = [];
+  for (const m of d.masked){
+    const key = m.category + '|' + m.original;
+    if (seen.has(key) || !m.original) continue;
+    seen.add(key);
+    rows.push(`<tr><td>${esc(m.category)}</td><td class="orig">${esc(m.original)}</td><td class="repl">${esc(m.placeholder)}</td></tr>`);
+  }
+  $('maskedRows').innerHTML = rows.join('');
+  $('count').textContent = rows.length;
+  $('detailsBox').style.display = rows.length ? 'block' : 'none';
+
+  layoutPreview();
+  // Place la rangée d'aperçus dans le champ de vision.
+  $('previewRow').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// Bascule PDF / Texte dans la colonne de résultat.
+function showView(view){
+  const pdf = view === 'pdf';
+  $('outViewer').style.display = pdf ? 'block' : 'none';
+  $('out').style.display = pdf ? 'none' : 'block';
+  document.querySelectorAll('#viewtabs .tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.view === view));
+}
+document.querySelectorAll('#viewtabs .tab').forEach(t =>
+  t.addEventListener('click', () => showView(t.dataset.view)));
+
+$('copy').onclick = () => {
+  navigator.clipboard.writeText($('out').value);
+  $('copy').textContent = '✓ Copié'; setTimeout(()=>$('copy').textContent='📋 Copier', 1500);
+};
+$('download').onclick = () => {
+  const blob = new Blob([$('out').value], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CR_anonymise_' + $('type').value + '.txt';
+  a.click();
+};
+$('downloadPdf').onclick = () => {
+  if (!lastPdf || !outUrl) return;
+  const a = document.createElement('a');
+  a.href = outUrl;
+  a.download = lastPdf.filename;
+  a.click();
+};
+
+// ===================== Génération de CR (IA) =====================
+// Génère le CR à partir du texte déjà anonymisé. Renvoie true si succès.
+async function runGenerate(){
+  $('genErr').textContent = '';
+  if (!lastAnonText.trim()) { $('genErr').textContent = 'Anonymisez d\'abord un CR.'; return false; }
+  $('generate').disabled = true; $('generate').textContent = '🧠 Génération en cours…';
+  try {
+    const r = await fetch('/api/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text: lastAnonText, cr_type: lastCrType, observations: $('observations').value })
+    });
+    const d = await r.json();
+    if (!r.ok){ $('genErr').innerHTML = esc(d.detail || 'Erreur de génération.'); return false; }
+    $('reportOut').value = d.report || '';
+    $('reportRow').style.display = 'grid';
+    $('reportRow').scrollIntoView({ behavior:'smooth', block:'start' });
+    return true;
+  } catch(e){
+    $('genErr').textContent = 'Erreur réseau : ' + e.message;
+    return false;
+  } finally {
+    $('generate').disabled = false; $('generate').textContent = '🧠 Générer le CR (IA)';
+  }
+}
+$('generate').onclick = runGenerate;
+$('reportCopy').onclick = () => {
+  navigator.clipboard.writeText($('reportOut').value);
+  $('reportCopy').textContent = '✓ Copié'; setTimeout(()=>$('reportCopy').textContent='📋 Copier le CR', 1500);
+};
+$('reportDownload').onclick = () => {
+  const blob = new Blob([$('reportOut').value], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CR_genere.txt';
+  a.click();
+};
+
+// ===================== Réglages IA (clé, modèle, system prompt) =====================
+let llmLoaded = false;
+let llmPrompts = {};       // system prompt par type d'examen
+let llmCurType = '';       // type d'examen actuellement édité
+let llmProviders = {};     // état des fournisseurs (modèle éditable inclus)
+let llmCurProvider = '';   // fournisseur affiché
+let llmTypedKeys = {};     // clés saisies (par fournisseur) avant enregistrement
+
+function showProvider(pid){
+  const p = llmProviders[pid] || {};
+  $('llmProvLabel').textContent = p.label ? '— ' + p.label : '';
+  $('llmModels').innerHTML = (p.models || []).map(m => `<option value="${esc(m)}">`).join('');
+  $('llmModel').value = p.model || '';
+  $('llmKey').value = llmTypedKeys[pid] || '';
+  $('llmKeyState').textContent = p.api_key_set ? '✓ une clé est déjà enregistrée' : '⚠ aucune clé enregistrée';
+  $('llmKeyState').className = 'cfg-exists ' + (p.api_key_set ? 'exists-ok' : 'exists-no');
+}
+
+async function loadLlmConfig(){
+  $('llmMsg').textContent = 'Chargement…';
+  try {
+    const d = await (await fetch('/api/llm-config')).json();
+    llmProviders = d.providers || {};
+    llmTypedKeys = {};
+    $('llmProvider').innerHTML = Object.entries(llmProviders).map(([id, p]) =>
+      `<option value="${id}">${esc(p.label)}</option>`).join('');
+    llmCurProvider = d.provider;
+    $('llmProvider').value = llmCurProvider;
+    showProvider(llmCurProvider);
+
+    llmPrompts = d.system_prompts || {};
+    $('llmType').innerHTML = (d.types || []).map(t =>
+      `<option value="${t.id}">${esc(t.label)}</option>`).join('');
+    llmCurType = $('llmType').value;
+    $('llmPrompt').value = llmPrompts[llmCurType] || '';
+    populateLtProviders();
+    llmLoaded = true;
+    $('llmMsg').textContent = '';
+  } catch(e){
+    $('llmMsg').innerHTML = '<span class="exists-no">Erreur de chargement : '+esc(e.message)+'</span>';
+  }
+}
+
+// Mémorise le modèle + clé du fournisseur courant avant d'en afficher un autre.
+function stashCurrentProvider(){
+  if (!llmCurProvider || !llmProviders[llmCurProvider]) return;
+  llmProviders[llmCurProvider].model = $('llmModel').value;
+  if ($('llmKey').value.trim()) llmTypedKeys[llmCurProvider] = $('llmKey').value.trim();
+}
+$('llmProvider').onchange = () => {
+  stashCurrentProvider();
+  llmCurProvider = $('llmProvider').value;
+  showProvider(llmCurProvider);
+};
+// Changer de type d'examen : mémorise le prompt en cours puis affiche l'autre.
+$('llmType').onchange = () => {
+  if (llmCurType) llmPrompts[llmCurType] = $('llmPrompt').value;
+  llmCurType = $('llmType').value;
+  $('llmPrompt').value = llmPrompts[llmCurType] || '';
+};
+$('llmReload').onclick = loadLlmConfig;
+// Teste la connexion au fournisseur affiché (clé saisie non encore enregistrée incluse).
+$('llmTest').onclick = async () => {
+  stashCurrentProvider();
+  const pid = llmCurProvider;
+  const payload = { provider: pid, model: (llmProviders[pid]||{}).model };
+  if (llmTypedKeys[pid]) payload.api_key = llmTypedKeys[pid];
+  $('llmTest').disabled = true;
+  $('llmTestMsg').innerHTML = '⏳ Test en cours…';
+  try {
+    const r = await fetch('/api/llm-test', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok){ $('llmTestMsg').innerHTML = '<span class="exists-no">✗ '+esc(d.detail||'Échec')+'</span>'; return; }
+    // Test réussi → on ENREGISTRE aussitôt la clé validée (évite le piège
+    // "testé mais pas enregistré" : la génération utiliserait l'ancienne clé).
+    if (llmTypedKeys[pid]){
+      try {
+        await fetch('/api/llm-config', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ providers: { [pid]: { api_key: llmTypedKeys[pid], model: payload.model } } })
+        });
+        llmProviders[pid].api_key_set = true;
+        if (pid === llmCurProvider) showProvider(pid);
+        refreshActiveAi();
+        $('llmTestMsg').innerHTML = '<span class="exists-ok">✓ Connexion OK ('+esc(d.model)+') — clé enregistrée.</span>';
+      } catch(_e){
+        $('llmTestMsg').innerHTML = '<span class="exists-ok">✓ Connexion OK ('+esc(d.model)+')</span> <span class="exists-no">(échec d\'enregistrement, cliquez 💾 Enregistrer)</span>';
+      }
+    } else {
+      $('llmTestMsg').innerHTML = '<span class="exists-ok">✓ Connexion OK ('+esc(d.model)+')</span>';
+    }
+  } catch(e){
+    $('llmTestMsg').innerHTML = '<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>';
+  } finally {
+    $('llmTest').disabled = false;
+  }
+};
+// Affiche l'IA active près du bouton « Générer le CR ».
+async function refreshActiveAi(){
+  try {
+    const d = await (await fetch('/api/llm-config')).json();
+    const p = (d.providers || {})[d.provider];
+    if (p) $('activeAi').innerHTML = '🧠 IA active : <b>'+esc(p.label)+'</b> · '+esc(p.model)
+      + (p.api_key_set ? '' : ' <span class="exists-no">(clé manquante)</span>');
+  } catch(e){ /* serveur indispo */ }
+}
+$('llmSave').onclick = async () => {
+  stashCurrentProvider();
+  if (llmCurType) llmPrompts[llmCurType] = $('llmPrompt').value;
+  // Construit la mise à jour : modèle de chaque fournisseur + clés saisies.
+  const providers = {};
+  for (const pid of Object.keys(llmProviders)){
+    providers[pid] = { model: llmProviders[pid].model };
+    if (llmTypedKeys[pid]) providers[pid].api_key = llmTypedKeys[pid];
+  }
+  const payload = { provider: llmCurProvider, providers, system_prompts: llmPrompts };
+  $('llmMsg').textContent = 'Enregistrement…';
+  try {
+    const r = await fetch('/api/llm-config', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok){ $('llmMsg').innerHTML = '<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+    $('llmMsg').innerHTML = '<span class="exists-ok">✓ Enregistré (fournisseur : '+esc(llmCurProvider)+').</span>';
+    loadLlmConfig();
+    refreshActiveAi();
+  } catch(e){
+    $('llmMsg').innerHTML = '<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>';
+  }
+};
+
+// ===================== Ajouter un type (assisté par IA) =====================
+let ltPdf = null, ltSpec = null, ltLabel = '', ltCurProvider = '';
+function populateLtProviders(){
+  $('ltProvider').innerHTML = Object.entries(llmProviders).map(([id,p]) =>
+    `<option value="${id}">${esc(p.label)}</option>`).join('');
+  ltCurProvider = $('ltProvider').value;
+  showLtProvider();
+}
+function showLtProvider(){
+  const p = llmProviders[ltCurProvider] || {};
+  $('ltModels').innerHTML = (p.models||[]).map(m => `<option value="${esc(m)}">`).join('');
+  $('ltModel').value = p.model || '';
+  $('ltKey').value = '';
+  $('ltKeyState').textContent = p.api_key_set ? '✓ une clé est déjà enregistrée pour ce fournisseur (laisse vide)' : '⚠ aucune clé enregistrée — saisis-la ci-dessus';
+  $('ltKeyState').className = 'cfg-exists ' + (p.api_key_set ? 'exists-ok' : 'exists-no');
+}
+$('ltProvider').onchange = () => { ltCurProvider = $('ltProvider').value; showLtProvider(); };
+
+const ltDrop = $('ltDrop');
+ltDrop.addEventListener('click', () => $('ltFile').click());
+$('ltFile').addEventListener('change', e => setLtFile(e.target.files[0]));
+['dragover','dragenter'].forEach(ev => ltDrop.addEventListener(ev, e => { e.preventDefault(); ltDrop.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => ltDrop.addEventListener(ev, e => { e.preventDefault(); ltDrop.classList.remove('drag'); }));
+ltDrop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) setLtFile(e.dataTransfer.files[0]); });
+function setLtFile(f){
+  if (!f || f.type !== 'application/pdf'){ $('ltMsg').innerHTML='<span class="exists-no">Choisis un fichier PDF.</span>'; return; }
+  ltPdf = f; $('ltFilename').textContent = '✓ ' + f.name; $('ltMsg').textContent='';
+}
+
+$('ltAnalyze').onclick = async () => {
+  const name = $('ltName').value.trim();
+  if (!name){ $('ltMsg').innerHTML='<span class="exists-no">Donne un nom au type.</span>'; return; }
+  if (!ltPdf){ $('ltMsg').innerHTML='<span class="exists-no">Glisse le PDF fictif.</span>'; return; }
+  const fd = new FormData();
+  fd.append('type_name', name); fd.append('provider', ltCurProvider);
+  fd.append('model', $('ltModel').value); fd.append('file', ltPdf);
+  if ($('ltKey').value.trim()) fd.append('api_key', $('ltKey').value.trim());
+  $('ltAnalyze').disabled = true; $('ltMsg').innerHTML='⏳ Analyse par l\'IA…'; $('ltResult').style.display='none';
+  try {
+    const r = await fetch('/api/learn-type', { method:'POST', body: fd });
+    const d = await r.json();
+    if (!r.ok){ $('ltMsg').innerHTML='<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+    ltSpec = d.spec; ltLabel = d.label;
+    const sp = d.spec || {};
+    const nameInfo = (sp.name_labels||[]).length ? (sp.name_labels||[]).join(', ')
+      : ((sp.name_before||[]).length ? '(sans libellé, avant « '+(sp.name_before||[]).join(', ')+' »)' : '—');
+    $('ltDetected').innerHTML = 'Libellés détectés — Nom : <b>'+esc(nameInfo)
+      +'</b> · N° : <b>'+esc((sp.id_labels||[]).join(', ')||'—')
+      +'</b> · Naissance : <b>'+esc((sp.dob_labels||[]).join(', ')||'—')+'</b> &nbsp;(modèle : '+esc(d.model||'')+')';
+    if ((d.leftovers||[]).length){
+      $('ltLeftovers').innerHTML = '<div class="note" style="border-color:rgba(248,113,113,.4)">⚠ Valeurs fictives encore présentes : <b>'
+        + d.leftovers.map(esc).join(', ') + '</b>. Règles incomplètes — vérifie les libellés du CR fictif ou réessaie.</div>';
+    } else {
+      $('ltLeftovers').innerHTML = '<span class="exists-ok">✓ Aucune valeur fictive ne subsiste — anonymisation complète sur cet échantillon.</span>';
+    }
+    $('ltResult').style.display = 'block';
+    // Liseuses : original à gauche, champs détectés (rouge) à droite.
+    if (ltPdf) ltPdf.arrayBuffer().then(buf => renderPdf($('ltSrcViewer'), buf));
+    if (d.pdf_base64){
+      const bytes = Uint8Array.from(atob(d.pdf_base64), c => c.charCodeAt(0));
+      renderPdf($('ltOutViewer'), bytes);
+    } else { $('ltOutViewer').innerHTML = '<div class="loading">Aperçu PDF indisponible</div>'; }
+    $('ltMsg').textContent='';
+    // La clé vient d'être mémorisée côté serveur -> reflète l'état.
+    if ($('ltKey').value.trim() && llmProviders[ltCurProvider]){
+      llmProviders[ltCurProvider].api_key_set = true;
+      $('ltKey').value = '';
+      $('ltKeyState').textContent = '✓ clé enregistrée pour ce fournisseur';
+      $('ltKeyState').className = 'cfg-exists exists-ok';
+    }
+  } catch(e){ $('ltMsg').innerHTML='<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>'; }
+  finally { $('ltAnalyze').disabled = false; }
+};
+
+$('ltSave').onclick = async () => {
+  if (!ltSpec) return;
+  $('ltMsg').textContent='Enregistrement…';
+  try {
+    const r = await fetch('/api/custom-types', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ label: ltLabel, spec: ltSpec })
+    });
+    const d = await r.json();
+    if (!r.ok){ $('ltMsg').innerHTML='<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+    $('ltMsg').innerHTML='<span class="exists-ok">✓ Type « '+esc(ltLabel)+' » enregistré.</span>';
+    ltPdf=null; ltSpec=null; $('ltFilename').textContent=''; $('ltName').value=''; $('ltResult').style.display='none';
+    loadCustomTypes(); refreshTypes();
+  } catch(e){ $('ltMsg').innerHTML='<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>'; }
+};
+
+async function loadCustomTypes(){
+  try {
+    const d = await (await fetch('/api/custom-types')).json();
+    const list = d.types || [];
+    if (!list.length){ $('ltList').innerHTML = '<span class="hint">(aucun type personnalisé pour l\'instant)</span>'; return; }
+    $('ltList').innerHTML = list.map(t => {
+      const nm = (t.name_labels||[]).length ? (t.name_labels||[]).join(', ')
+        : ((t.name_before||[]).length ? 'avant « '+(t.name_before||[]).join(', ')+' »' : '⚠ non détecté');
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:10px;margin:6px 0">
+        <div style="flex:1">
+          <b style="color:var(--text)">${esc(t.label)}</b>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px">Nom : ${esc(nm)} · N° : ${esc((t.id_labels||[]).join(', ')||'—')} · Naissance : ${esc((t.dob_labels||[]).join(', ')||'—')}</div>
+        </div>
+        <button class="cfg-del" data-id="${esc(t.id)}" style="width:auto;padding:7px 14px">🗑 Supprimer</button>
+      </div>`;
+    }).join('');
+    $('ltList').querySelectorAll('.cfg-del').forEach(b => b.onclick = async () => {
+      if (!confirm('Supprimer ce type personnalisé ?')) return;
+      await fetch('/api/custom-types/'+encodeURIComponent(b.dataset.id), { method:'DELETE' });
+      loadCustomTypes(); refreshTypes();
+    });
+  } catch(e){ $('ltList').innerHTML=''; }
+}
+
+// Rafraîchit les listes de types partout (Anonymiser, surveillance, prompts IA).
+async function refreshTypes(){
+  try {
+    const d = await (await fetch('/api/types')).json();
+    const cur = $('type').value;
+    $('type').innerHTML = (d.types||[]).map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join('');
+    if ([...$('type').options].some(o => o.value === cur)) $('type').value = cur;
+  } catch(e){}
+  loadConfig(); loadLlmConfig();
+}
+
+// ===================== Workflow (liste de travail -> interprétation) =====================
+let wfSelectedId = null;
+let wfPollTimer = null;
+let wfBusy = false;          // génération en cours : on suspend le rafraîchissement
+let wfLoading = false;       // un scan est déjà en cours : on n'empile pas les requêtes
+const b64ToBytes = (b64) => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+
+function fmtTime(epoch){
+  try { return new Date(epoch * 1000).toLocaleString('fr-FR',
+    { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }); }
+  catch(e){ return ''; }
+}
+
+async function loadWorkflow(){
+  if (wfLoading) return;          // évite d'empiler les scans (partage réseau lent)
+  wfLoading = true;
+  try {
+    const d = await (await fetch('/api/workflow/exams')).json();
+    renderWfList(d.exams || []);
+  } catch(e){
+    $('wfStatus').innerHTML = '<span class="exists-no">Erreur : '+esc(e.message)+'</span>';
+  } finally {
+    wfLoading = false;
+  }
+}
+
+function renderWfList(exams){
+  const n = exams.length;
+  const done = exams.filter(e => e.anonymized).length;
+  $('wfStatus').textContent = n
+    ? `${n} examen(s) · ${done} anonymisé(s)`
+    : 'Aucun examen dans les dossiers surveillés activés.';
+  if (!n){ $('wfItems').innerHTML = '<div class="wf-empty">Dépose un PDF dans un dossier suivi (coché en Configuration) : il apparaîtra ici.</div>'; return; }
+
+  $('wfItems').innerHTML = exams.map(e => {
+    const status = e.anonymized
+      ? '<span class="wf-badge wf-ok">✓ anonymisé</span>'
+      : (e.error
+          ? `<span class="wf-badge wf-warn">⚠ ${esc(e.error)}</span>`
+          : '<span class="wf-badge wf-pend">⏳ anonymisation…</span>');
+    const cr = e.has_cr ? '<span class="wf-badge wf-crb">CR ✓</span>' : '';
+    const typ = e.type_label ? `<span class="wf-badge">${esc(e.type_label)}</span>` : '';
+    return `<div class="wf-item${e.id===wfSelectedId?' sel':''}" data-id="${e.id}">
+      <div class="nm">${esc(e.name)}</div>
+      <div class="meta">${status}${cr}${typ}<span>${esc(e.folder)}</span><span>${fmtTime(e.mtime)}</span></div>
+    </div>`;
+  }).join('');
+
+  $('wfItems').querySelectorAll('.wf-item').forEach(el =>
+    el.onclick = () => selectExam(el.dataset.id));
+}
+
+async function selectExam(id){
+  wfSelectedId = id;
+  $('wfItems').querySelectorAll('.wf-item').forEach(el =>
+    el.classList.toggle('sel', el.dataset.id === id));
+  $('wfEmpty').style.display = 'none';
+  $('wfPanel').style.display = 'block';
+  $('wfTitle').textContent = 'Chargement…';
+  $('wfPills').innerHTML = ''; $('wfGenMsg').textContent = '';
+  $('wfObs').value = ''; $('wfCrRow').style.display = 'none'; $('wfCr').value = '';
+  $('wfAnonViewer').innerHTML = '<div class="loading">Chargement…</div>';
+  $('wfSrcViewer').innerHTML = '';
+  setWfView('anon');
+
+  let d;
+  try {
+    const r = await fetch('/api/workflow/exam/' + encodeURIComponent(id));
+    d = await r.json();
+    if (!r.ok){ $('wfTitle').textContent = 'Erreur'; $('wfGenMsg').innerHTML = '<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+  } catch(e){ $('wfTitle').textContent = 'Erreur réseau'; return; }
+
+  $('wfTitle').textContent = d.name;
+  const sum = d.summary || {};
+  $('wfPills').innerHTML = Object.keys(sum).length
+    ? Object.entries(sum).map(([k,v]) => `<span class="pill">${esc(k)} <b>${v}</b></span>`).join('')
+    : (d.error ? `<span class="wf-badge wf-warn">⚠ ${esc(d.error)}</span>` : '');
+  $('wfGen').disabled = !d.anonymized;
+
+  if (d.cr_text){ $('wfCr').value = d.cr_text; $('wfCrRow').style.display = 'block'; }
+
+  if (d.anon_pdf_base64) renderPdf($('wfAnonViewer'), b64ToBytes(d.anon_pdf_base64));
+  else $('wfAnonViewer').innerHTML = '<div class="loading">Aperçu anonymisé indisponible.</div>';
+  if (d.source_pdf_base64) renderPdf($('wfSrcViewer'), b64ToBytes(d.source_pdf_base64));
+}
+
+function setWfView(v){
+  $('wfAnonViewer').style.display = v === 'anon' ? 'block' : 'none';
+  $('wfSrcViewer').style.display = v === 'src' ? 'block' : 'none';
+  $('wfViewTabs').querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.wfview === v));
+}
+$('wfViewTabs').querySelectorAll('.tab').forEach(t =>
+  t.onclick = () => setWfView(t.dataset.wfview));
+
+$('wfRefresh').onclick = loadWorkflow;
+
+$('wfGen').onclick = async () => {
+  if (!wfSelectedId) return;
+  wfBusy = true;
+  $('wfGen').disabled = true; $('wfGen').textContent = '🧠 Génération en cours…';
+  $('wfGenMsg').textContent = '';
+  try {
+    const r = await fetch('/api/workflow/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: wfSelectedId, observations: $('wfObs').value })
+    });
+    const d = await r.json();
+    if (!r.ok){ $('wfGenMsg').innerHTML = '<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+    $('wfCr').value = d.report || '';
+    $('wfCrRow').style.display = 'block';
+    $('wfGenMsg').innerHTML = '<span class="exists-ok">✓ CR enregistré : '+esc(d.cr_filename||'')+'</span>';
+    $('wfCrRow').scrollIntoView({ behavior:'smooth', block:'start' });
+    loadWorkflow();  // met à jour le badge "CR ✓" dans la liste
+  } catch(e){
+    $('wfGenMsg').innerHTML = '<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>';
+  } finally {
+    wfBusy = false;
+    $('wfGen').disabled = false; $('wfGen').textContent = '🧠 Générer le CR (IA)';
+  }
+};
+$('wfCrCopy').onclick = () => {
+  navigator.clipboard.writeText($('wfCr').value);
+  $('wfCrCopy').textContent = '✓ Copié'; setTimeout(()=>$('wfCrCopy').textContent='📋 Copier le CR', 1500);
+};
+$('wfCrDownload').onclick = () => {
+  const blob = new Blob([$('wfCr').value], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'CR_genere.txt'; a.click();
+};
+
+function startWfPoll(){
+  if (wfPollTimer) return;
+  wfPollTimer = setInterval(() => { if (!wfBusy) loadWorkflow(); }, 6000);
+}
+function stopWfPoll(){ if (wfPollTimer){ clearInterval(wfPollTimer); wfPollTimer = null; } }
+
+// ===================== Onglets (Anonymiser / Configuration) =====================
+let crTypes = [{ id:'auto', label:'Détection automatique' }];
+let cfgLoaded = false;
+
+document.querySelectorAll('.navtab').forEach(t => t.addEventListener('click', () => {
+  const view = t.dataset.view;
+  document.querySelectorAll('.navtab').forEach(x => x.classList.toggle('active', x === t));
+  $('viewWork').style.display = view === 'work' ? 'block' : 'none';
+  $('viewAnon').style.display = view === 'anon' ? 'block' : 'none';
+  $('viewDocs').style.display = view === 'docs' ? 'block' : 'none';
+  $('viewConfig').style.display = view === 'config' ? 'block' : 'none';
+  if (view === 'work'){ loadWorkflow(); startWfPoll(); } else { stopWfPoll(); }
+  if (view === 'config'){
+    if (!cfgLoaded) loadConfig();
+    if (!llmLoaded) loadLlmConfig();
+  }
+  if (view === 'docs'){
+    if (!llmLoaded) loadLlmConfig();  // peuple les fournisseurs (clé/modèle)
+    loadCustomTypes();
+  }
+}));
+
+// --------- Configuration de la surveillance ---------
+function typeOptions(selected){
+  return crTypes.map(t =>
+    `<option value="${t.id}"${t.id===selected?' selected':''}>${esc(t.label)}</option>`).join('');
+}
+
+function addCfgRow(entry){
+  entry = entry || { directory:'', cr_type:'auto', enabled:true, recursive:true, exists:false };
+  const row = document.createElement('div');
+  row.className = 'cfg-row';
+  row.innerHTML = `
+    <div>
+      <input type="text" class="cfg-dir" placeholder="\\\\SERVEUR\\dossier  ou  C:/chemin/dossier" value="${esc(entry.directory)}" />
+      <div class="cfg-exists"></div>
+    </div>
+    <select class="cfg-type">${typeOptions(entry.cr_type)}</select>
+    <label class="cfg-enabled"><input type="checkbox" class="cfg-on" ${entry.enabled?'checked':''}/> activée</label>
+    <label class="cfg-enabled"><input type="checkbox" class="cfg-rec" ${entry.recursive!==false?'checked':''}/> oui</label>
+    <button class="cfg-del" title="Supprimer">✕</button>`;
+  const ex = row.querySelector('.cfg-exists');
+  if (entry.directory){
+    ex.textContent = entry.exists ? '✓ dossier trouvé' : '⚠ dossier introuvable (sera créé)';
+    ex.className = 'cfg-exists ' + (entry.exists ? 'exists-ok' : 'exists-no');
+  }
+  row.querySelector('.cfg-del').onclick = () => row.remove();
+  $('cfgRows').appendChild(row);
+}
+
+async function loadConfig(){
+  $('cfgMsg').textContent = 'Chargement…';
+  try {
+    const d = await (await fetch('/api/config')).json();
+    crTypes = d.cr_types || crTypes;
+    $('cfgInterval').value = d.poll_interval_seconds || 10;
+    $('cfgRows').innerHTML = '';
+    (d.watch || []).forEach(addCfgRow);
+    if (!d.watch || !d.watch.length) addCfgRow();
+    cfgLoaded = true;
+    $('cfgMsg').textContent = '';
+  } catch(e){
+    $('cfgMsg').innerHTML = '<span class="exists-no">Erreur de chargement : '+esc(e.message)+'</span>';
+  }
+}
+
+$('cfgAdd').onclick = () => addCfgRow();
+$('cfgReload').onclick = loadConfig;
+
+$('cfgSave').onclick = async () => {
+  const watch = [...document.querySelectorAll('#cfgRows .cfg-row')].map(r => ({
+    directory: r.querySelector('.cfg-dir').value.trim(),
+    cr_type: r.querySelector('.cfg-type').value,
+    enabled: r.querySelector('.cfg-on').checked,
+    recursive: r.querySelector('.cfg-rec').checked,
+  })).filter(w => w.directory);
+  const payload = { poll_interval_seconds: parseInt($('cfgInterval').value,10) || 10, watch };
+  $('cfgMsg').textContent = 'Enregistrement…';
+  try {
+    const r = await fetch('/api/config', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok){ $('cfgMsg').innerHTML = '<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
+    let msg = '<span class="exists-ok">✓ Enregistré ('+d.saved+' dossier(s)). Appliqué automatiquement.</span>';
+    if (d.warnings && d.warnings.length) msg += '<br><span class="exists-no">'+d.warnings.map(esc).join('<br>')+'</span>';
+    $('cfgMsg').innerHTML = msg;
+    loadConfig(); // rafraîchit l'état "dossier trouvé"
+  } catch(e){
+    $('cfgMsg').innerHTML = '<span class="exists-no">Erreur réseau : '+esc(e.message)+'</span>';
+  }
+};
+</script>
+</body>
+</html>
