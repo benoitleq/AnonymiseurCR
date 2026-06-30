@@ -1390,7 +1390,8 @@ async function selectExam(id){
   $('wfPanel').style.display = 'block';
   $('wfTitle').textContent = 'Chargement…';
   $('wfPills').innerHTML = ''; $('wfGenMsg').textContent = '';
-  $('wfObs').value = ''; $('wfCrRow').style.display = 'none'; $('wfCr').value = '';
+  $('wfObs').value = ''; $('wfCrRow').style.display = 'none';
+  $('wfCr').value = ''; $('wfCrRich').innerHTML = ''; wfReportMd = '';
   $('wfAnonViewer').innerHTML = '<div class="loading">Chargement…</div>';
   $('wfSrcViewer').innerHTML = '';
   setWfView('anon');
@@ -1409,7 +1410,11 @@ async function selectExam(id){
     : (d.error ? `<span class="wf-badge wf-warn">⚠ ${esc(d.error)}</span>` : '');
   $('wfGen').disabled = !d.anonymized;
 
-  if (d.cr_text){ $('wfCr').value = d.cr_text; $('wfCrRow').style.display = 'block'; }
+  if (d.cr_text){
+    $('wfCr').value = d.cr_text; wfReportMd = d.cr_text;   // CR sauvegarde (.txt, sans gras)
+    $('wfCrRich').innerHTML = crToHtml(d.cr_text);
+    $('wfCrRow').style.display = 'block';
+  }
 
   if (d.anon_pdf_base64) renderPdf($('wfAnonViewer'), b64ToBytes(d.anon_pdf_base64));
   else $('wfAnonViewer').innerHTML = '<div class="loading">Aperçu anonymisé indisponible.</div>';
