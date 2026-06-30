@@ -151,6 +151,13 @@
     background:#7f1d1d; color:#fff; border:none; border-radius:4px; cursor:pointer; }
   .zone-resize { position:absolute; right:-6px; bottom:-6px; width:12px; height:12px;
     background:#fff; border:2px solid #334155; border-radius:50%; cursor:nwse-resize; }
+  /* Liseuse riche du CR : affiche le gras, copiable direct (-> Word) */
+  .cr-rich { background:#fff; color:#0f172a; border:1px solid var(--line); border-radius:10px;
+    padding:16px 18px; min-height:200px; max-height:460px; overflow:auto; line-height:1.55;
+    font-size:14px; font-family:Calibri,'Segoe UI',Arial,sans-serif; user-select:text;
+    white-space:normal; }
+  .cr-rich strong { font-weight:700; }
+  .cr-rich:empty::before { content:'Le CR généré apparaîtra ici…'; color:#94a3b8; }
 </style>
 </head>
 <body>
@@ -208,12 +215,13 @@
         <div id="wfCrRow" style="display:none">
           <div class="spacer"></div>
           <h2>🧠 Compte rendu généré</h2>
-          <textarea id="wfCr" readonly style="min-height:320px"></textarea>
+          <textarea id="wfCr" readonly style="display:none"></textarea>
+          <div id="wfCrRich" class="cr-rich"></div>
           <div class="spacer"></div>
           <div class="row">
-            <button class="secondary" id="wfCrCopy">📋 Copier le CR</button>
+            <button id="wfCrCopy">📋 Copier (avec gras)</button>
             <button class="secondary" id="wfCrDownload">⬇ .txt</button>
-            <button id="wfCrLetter">📄 Courrier (Word, gras)</button>
+            <button class="secondary" id="wfCrLetter">📄 Word (.rtf)</button>
           </div>
         </div>
       </div>
@@ -322,12 +330,13 @@
       <h2>🧠 Compte rendu généré (IA)</h2>
       <p class="hint">Vérifie les valeurs en les comparant aux deux aperçus ci-dessus avant de copier.</p>
       <div class="spacer"></div>
-      <textarea id="reportOut" readonly style="min-height:420px" placeholder="Le CR généré apparaîtra ici…"></textarea>
+      <textarea id="reportOut" readonly style="display:none"></textarea>
+      <div id="reportRich" class="cr-rich"></div>
       <div class="spacer"></div>
       <div class="row">
-        <button class="secondary" id="reportCopy">📋 Copier le CR</button>
+        <button id="reportCopy">📋 Copier (avec gras)</button>
         <button class="secondary" id="reportDownload">⬇ .txt</button>
-        <button id="reportLetter">📄 Courrier (Word, gras)</button>
+        <button class="secondary" id="reportLetter">📄 Word (.rtf)</button>
       </div>
     </section>
   </div>
@@ -793,7 +802,8 @@ async function runGenerate(){
     const d = await r.json();
     if (!r.ok){ $('genErr').innerHTML = esc(d.detail || 'Erreur de génération.'); return false; }
     $('reportOut').value = d.report || '';
-    reportMd = d.report_md || d.report || '';   // version avec gras pour le courrier
+    reportMd = d.report_md || d.report || '';   // version avec gras (liseuse + courrier)
+    $('reportRich').innerHTML = crToHtml(reportMd);
     $('reportRow').style.display = 'grid';
     $('reportRow').scrollIntoView({ behavior:'smooth', block:'start' });
     return true;
@@ -805,10 +815,7 @@ async function runGenerate(){
   }
 }
 $('generate').onclick = runGenerate;
-$('reportCopy').onclick = () => {
-  navigator.clipboard.writeText($('reportOut').value);
-  $('reportCopy').textContent = '✓ Copié'; setTimeout(()=>$('reportCopy').textContent='📋 Copier le CR', 1500);
-};
+$('reportCopy').onclick = () => copyRich(reportMd, $('reportCopy'), 'reportRich');
 $('reportDownload').onclick = () => {
   const blob = new Blob([$('reportOut').value], {type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
@@ -845,6 +852,34 @@ function downloadCourrier(md, base){
   a.href = URL.createObjectURL(blob);
   a.download = (base || 'Courrier_CR') + '.rtf';
   document.body.appendChild(a); a.click(); a.remove();
+}
+
+// Rendu HTML du CR (gras **...**) -> liseuse + copier-coller mis en forme.
+function crToHtml(md){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (md||'').split('\n').map(line =>
+    line.split('**').map((seg,i) => i % 2 ? '<strong>'+esc(seg)+'</strong>' : esc(seg)).join('')
+  ).join('<br>');
+}
+// Copie le CR AVEC le gras (text/html) -> collage direct dans Word, sans fichier.
+async function copyRich(md, btn, richId){
+  if (!md || !md.trim()) return;
+  const ok = () => { const t = btn.textContent; btn.textContent = '✓ Copié (gras)'; setTimeout(()=>btn.textContent=t, 1600); };
+  const html = '<div style="font-family:Calibri,Arial,sans-serif">' + crToHtml(md) + '</div>';
+  const plain = md.replace(/\*\*/g, '');
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([html], { type:'text/html' }),
+      'text/plain': new Blob([plain], { type:'text/plain' })
+    })]);
+    ok(); return;
+  } catch(e){ /* repli ci-dessous */ }
+  try {  // repli : sélectionner la liseuse rendue puis copier
+    const el = document.getElementById(richId);
+    const sel = window.getSelection(); const range = document.createRange();
+    range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+    document.execCommand('copy'); sel.removeAllRanges(); ok();
+  } catch(e2){ alert('Copie impossible — utilise le bouton Word (.rtf).'); }
 }
 
 // ===================== Réglages IA (clé, modèle, system prompt) =====================
@@ -1405,7 +1440,8 @@ $('wfGen').onclick = async () => {
     const d = await r.json();
     if (!r.ok){ $('wfGenMsg').innerHTML = '<span class="exists-no">'+esc(d.detail||'Erreur')+'</span>'; return; }
     $('wfCr').value = d.report || '';
-    wfReportMd = d.report_md || d.report || '';   // version avec gras pour le courrier
+    wfReportMd = d.report_md || d.report || '';   // version avec gras (liseuse + courrier)
+    $('wfCrRich').innerHTML = crToHtml(wfReportMd);
     $('wfCrRow').style.display = 'block';
     $('wfGenMsg').innerHTML = '<span class="exists-ok">✓ CR enregistré : '+esc(d.cr_filename||'')+'</span>';
     $('wfCrRow').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -1417,10 +1453,7 @@ $('wfGen').onclick = async () => {
     $('wfGen').disabled = false; $('wfGen').textContent = '🧠 Générer le CR (IA)';
   }
 };
-$('wfCrCopy').onclick = () => {
-  navigator.clipboard.writeText($('wfCr').value);
-  $('wfCrCopy').textContent = '✓ Copié'; setTimeout(()=>$('wfCrCopy').textContent='📋 Copier le CR', 1500);
-};
+$('wfCrCopy').onclick = () => copyRich(wfReportMd, $('wfCrCopy'), 'wfCrRich');
 $('wfCrDownload').onclick = () => {
   const blob = new Blob([$('wfCr').value], {type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
