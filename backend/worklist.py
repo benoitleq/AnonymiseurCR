@@ -152,11 +152,18 @@ def _arrival_time(st) -> float:
 
 
 def _new_record(path: Path, cr_type_cfg: str, root: str, st) -> dict:
-    """Enregistrement LEGER (sans lecture du PDF). type_label connu si type explicite."""
+    """Enregistrement LEGER (sans lecture du PDF). type_label connu si type explicite.
+
+    'seen' = instant ou le scanner DECOUVRE le fichier. C'est ce qui sert au tri et
+    a l'affichage : le Workflow n'affiche que des examens apparus APRES l'ouverture,
+    donc chaque examon a un 'seen' fiable. Contrairement aux dates du fichier
+    (mtime decale par l'appareil, ctime conserve a la copie), 'seen' reflete
+    vraiment 'quand je l'ai ajoute' -> le dernier depose est toujours en tete."""
     label = "" if cr_type_cfg == "auto" else _all_labels().get(cr_type_cfg, cr_type_cfg)
     return {
         "id": _exam_id(path), "path": str(path), "name": path.name,
         "folder": _rel_folder(path, root), "mtime": _arrival_time(st), "size": st.st_size,
+        "seen": time.time(),
         "cr_type_cfg": cr_type_cfg, "cr_type": None, "type_label": label,
         "anonymized": False, "pending": True, "error": "",
         "anon_text": "", "summary": {}, "masked": [],
@@ -307,7 +314,10 @@ def _scan_once() -> None:
                     _CACHE[eid] = rec
                 else:
                     rec["has_cr"] = _cr_path(pdf).exists()
-            dir_pairs.append((arrival, eid))
+                seen = rec["seen"]
+            # Tri par heure de DECOUVERTE (et non par date du fichier) : le dernier
+            # examen depose remonte en tete, quel que soit son type / sa date interne.
+            dir_pairs.append((seen, eid))
         if dir_first:
             _BASELINED_DIRS.add(root)
         _DIR_STATE[root] = {"mtime": root_mtime, "pairs": dir_pairs,
@@ -384,7 +394,8 @@ def list_exams() -> list[dict]:
             tid = r["cr_type"] or (r["cr_type_cfg"] if r["cr_type_cfg"] != "auto" else None)
             color = colors.get(tid) or (default_color_for(tid) if tid else "#64748b")
             out.append({
-                "id": r["id"], "name": r["name"], "folder": r["folder"], "mtime": r["mtime"],
+                "id": r["id"], "name": r["name"], "folder": r["folder"],
+                "mtime": r.get("seen", r["mtime"]),   # heure de decouverte (= ordre)
                 "anonymized": r["anonymized"], "pending": r["pending"], "error": r["error"],
                 "type_label": r["type_label"], "summary": r["summary"], "has_cr": r["has_cr"],
                 "type_color": color,
