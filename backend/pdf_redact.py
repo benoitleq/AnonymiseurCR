@@ -73,6 +73,10 @@ def _redact(doc, id_spans, fill, text_color, zones=None) -> list[Masked]:
     for pno, page in enumerate(doc):
         page_text = sanitize_text(page.get_text())
         spans = list(id_spans) + regex_spans(page_text)
+        # Sur une page TOURNEE, le texte du jeton ([NOM]...) est dessine tourne
+        # (vertical) et se chevauche -> illisible. On pose alors un cachet PLEIN
+        # sans texte ; le recap indique deja ce qui est masque.
+        rotated = bool(page.rotation)
 
         seen: set[str] = set()
         redacted_rects: list[fitz.Rect] = []
@@ -86,8 +90,8 @@ def _redact(doc, id_spans, fill, text_color, zones=None) -> list[Masked]:
                 redacted_rects.append(rect)
                 fontsize = max(6.0, min(11.0, rect.height * 0.8))
                 page.add_redact_annot(
-                    rect, text=token, fontname="helv", fontsize=fontsize,
-                    text_color=text_color, fill=fill, cross_out=False,
+                    rect, text=("" if rotated else token), fontname="helv",
+                    fontsize=fontsize, text_color=text_color, fill=fill, cross_out=False,
                 )
                 masked.append(Masked(category, needle, token))
 
@@ -101,8 +105,8 @@ def _redact(doc, id_spans, fill, text_color, zones=None) -> list[Masked]:
             token = token_for(z["cat"])
             fontsize = max(6.0, min(11.0, rect.height * 0.6))
             page.add_redact_annot(
-                rect, text=token, fontname="helv", fontsize=fontsize,
-                text_color=text_color, fill=fill, cross_out=False,
+                rect, text=("" if rotated else token), fontname="helv",
+                fontsize=fontsize, text_color=text_color, fill=fill, cross_out=False,
             )
             masked.append(Masked(z["cat"], "(zone)", token))
 
